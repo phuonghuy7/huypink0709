@@ -1,3 +1,10 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero",
+      "description": "A minimalist abstract background with gentle blue tones",
+      "imageUrl": "https://images.unsplash.com/photo-1623150502742-6a849aa94be4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxtaW5pbWFsaXN0JTIwYWJzdHJhY3R8ZW58MHx8fHwxNzYwOTQ5MjUxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "minimalist abstract"
+    }
+  ]
 }
