@@ -28,6 +28,12 @@ export function Header() {
           >
             Contact
           </Link>
+          <Link
+            href="/login"
+            className="transition-colors hover:text-primary"
+          >
+            Login
+          </Link>
         </nav>
       </div>
     </header>
