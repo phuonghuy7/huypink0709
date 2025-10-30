@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // Import useEffect
 import { VideoList } from '@/components/video-list';
 import { UploadMenu } from '@/components/upload-menu';
 import { Header } from '@/components/header';
 import { VideoPreviewModal } from '@/components/video-preview-modal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button'; // Import Button
+import { Button } from '@/components/ui/button';
 
 // Define the video type
 interface Video {
@@ -17,16 +17,37 @@ interface Video {
 }
 
 export default function Home() {
+  // Initialize state with an empty array. It will be populated from localStorage on the client.
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-  const [isDeleteMode, setIsDeleteMode] = useState(false); // State for delete mode
+  const [isDeleteMode, setIsDeleteMode] = useState(false);
+
+  // Effect to load videos from localStorage on initial client-side render
+  useEffect(() => {
+    try {
+      const storedVideos = localStorage.getItem('videoLibrary');
+      if (storedVideos) {
+        setVideos(JSON.parse(storedVideos));
+      }
+    } catch (error) {
+      console.error("Failed to parse videos from localStorage", error);
+    }
+  }, []); // Empty dependency array ensures this runs only once on mount
+
+  // Effect to save videos to localStorage whenever the list changes
+  useEffect(() => {
+    try {
+      localStorage.setItem('videoLibrary', JSON.stringify(videos));
+    } catch (error) {
+      console.error("Failed to save videos to localStorage", error);
+    }
+  }, [videos]); // This runs every time the `videos` state changes
 
   const handleVideoAdded = (video: Video) => {
     setVideos(prevVideos => [...prevVideos, video]);
   };
 
   const handleVideoSelect = (video: Video) => {
-    // Do not open preview if in delete mode
     if (isDeleteMode) return;
     setSelectedVideo(video);
   };
@@ -48,7 +69,6 @@ export default function Home() {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <CardTitle>Welcome to Your Video Library</CardTitle>
-                {/* Toggle Delete Mode Button */}
                 <Button variant="destructive" onClick={() => setIsDeleteMode(!isDeleteMode)}>
                   {isDeleteMode ? 'Cancel' : 'Delete Videos'}
                 </Button>
@@ -62,7 +82,6 @@ export default function Home() {
 
           <UploadMenu onVideoAdded={handleVideoAdded} />
 
-          {/* Pass delete mode state and handler to VideoList */}
           <VideoList 
             videos={videos} 
             onVideoSelect={handleVideoSelect} 
