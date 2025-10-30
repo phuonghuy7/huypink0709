@@ -6,8 +6,9 @@ import { UploadMenu } from '@/components/upload-menu';
 import { Header } from '@/components/header';
 import { VideoPreviewModal } from '@/components/video-preview-modal';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button'; // Import Button
 
-// Define the video type with the new thumbnail property
+// Define the video type
 interface Video {
   title: string;
   url?: string;
@@ -16,21 +17,24 @@ interface Video {
 }
 
 export default function Home() {
-  // The state for the video list is now reset on each page load.
-  // This removes the complexity and bugs associated with localStorage.
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [isDeleteMode, setIsDeleteMode] = useState(false); // State for delete mode
 
   const handleVideoAdded = (video: Video) => {
     setVideos(prevVideos => [...prevVideos, video]);
   };
 
-  // When a video is selected from the list, set it as the selected video
   const handleVideoSelect = (video: Video) => {
+    // Do not open preview if in delete mode
+    if (isDeleteMode) return;
     setSelectedVideo(video);
   };
 
-  // To close the modal, just set the selected video to null
+  const handleVideoDelete = (videoIndex: number) => {
+    setVideos(prevVideos => prevVideos.filter((_, index) => index !== videoIndex));
+  };
+
   const handleCloseModal = () => {
     setSelectedVideo(null);
   };
@@ -40,10 +44,15 @@ export default function Home() {
       <Header />
       <main className="p-4 md:p-8">
         <div className="space-y-8">
-          {/* Welcome/Instruction card */}
           <Card>
             <CardHeader>
-              <CardTitle>Welcome to Your Video Library</CardTitle>
+              <div className="flex justify-between items-center">
+                <CardTitle>Welcome to Your Video Library</CardTitle>
+                {/* Toggle Delete Mode Button */}
+                <Button variant="destructive" onClick={() => setIsDeleteMode(!isDeleteMode)}>
+                  {isDeleteMode ? 'Cancel' : 'Delete Videos'}
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               <p>Use the buttons below to upload videos from your device or Google Drive. </p>
@@ -51,15 +60,18 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          {/* The upload menu */}
           <UploadMenu onVideoAdded={handleVideoAdded} />
 
-          {/* The list of videos */}
-          <VideoList videos={videos} onVideoSelect={handleVideoSelect} />
+          {/* Pass delete mode state and handler to VideoList */}
+          <VideoList 
+            videos={videos} 
+            onVideoSelect={handleVideoSelect} 
+            onVideoDelete={handleVideoDelete}
+            isDeleteMode={isDeleteMode}
+          />
         </div>
       </main>
 
-      {/* The modal for video previews */}
       <VideoPreviewModal video={selectedVideo} onClose={handleCloseModal} />
     </div>
   );
