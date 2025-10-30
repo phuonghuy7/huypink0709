@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       {/* Add the Google Identity Services script */}
       <Script src="https://accounts.google.com/gsi/client" async defer />
       <body className={inter.className}>{children}</body>
