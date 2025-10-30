@@ -119,7 +119,8 @@ export function UploadMenu({ onVideoAdded }: UploadMenuProps) {
         }
       },
     });
-    tokenClient.requestAccessToken({ prompt: 'consent' });
+    // The 'prompt' parameter is removed. The user will only be prompted on the first grant.
+    tokenClient.requestAccessToken();
   };
 
 
