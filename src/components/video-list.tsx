@@ -1,22 +1,21 @@
 'use client';
 
 import { Card, CardContent } from "./ui/card";
-import { Button } from "./ui/button"; // Import Button for the delete icon
+import { Button } from "./ui/button";
 
-// Define the video type to match the one in page.tsx
 interface Video {
+  id: string; // Add id to match Firestore document
   title: string;
   url?: string;
   embedUrl?: string;
   thumbnail?: string;
 }
 
-// Update props to include delete mode state and the delete handler
 interface VideoListProps {
   videos: Video[];
   onVideoSelect: (video: Video) => void;
-  onVideoDelete: (index: number) => void; // Function to delete a video
-  isDeleteMode: boolean; // Flag to indicate if delete mode is active
+  onVideoDelete: (videoId: string) => void; // Expect a videoId (string) instead of index
+  isDeleteMode: boolean;
 }
 
 export function VideoList({ videos, onVideoSelect, onVideoDelete, isDeleteMode }: VideoListProps) {
@@ -33,25 +32,23 @@ export function VideoList({ videos, onVideoSelect, onVideoDelete, isDeleteMode }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-      {videos.map((video, index) => (
+      {videos.map((video) => (
         <Card
-          key={index}
+          key={video.id} // Use the unique Firestore ID as the key
           className={`group overflow-hidden transition-shadow hover:shadow-lg ${!isDeleteMode && 'cursor-pointer'}`}
-          onClick={() => !isDeleteMode && onVideoSelect(video)} // Only trigger select if not in delete mode
+          onClick={() => !isDeleteMode && onVideoSelect(video)}
         >
-          <CardContent className="p-0 relative"> {/* Add relative positioning */}
-            {/* Delete Button - shown only in delete mode */}
+          <CardContent className="p-0 relative">
             {isDeleteMode && (
               <Button
                 variant="destructive"
                 size="icon"
                 className="absolute top-2 right-2 z-10 h-8 w-8 rounded-full"
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent the card's click event from firing
-                  onVideoDelete(index);
+                  e.stopPropagation();
+                  onVideoDelete(video.id); // Pass the video's unique ID to the delete handler
                 }}
               >
-                {/* Close (X) icon */}
                 <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
@@ -59,11 +56,10 @@ export function VideoList({ videos, onVideoSelect, onVideoDelete, isDeleteMode }
             )}
 
             <div className="aspect-video bg-gray-200 flex items-center justify-center overflow-hidden relative">
-              {/* Media preview */}
               {video.thumbnail ? (
                 <div
                   style={{ backgroundImage: `url(${video.thumbnail})` }}
-                  className={`w-full h-full bg-cover bg-center ${isDeleteMode && 'opacity-60'}`} // Dim video in delete mode
+                  className={`w-full h-full bg-cover bg-center ${isDeleteMode && 'opacity-60'}`}
                   role="img"
                   aria-label={video.title}
                 />
@@ -73,7 +69,6 @@ export function VideoList({ videos, onVideoSelect, onVideoDelete, isDeleteMode }
                 </div>
               )}
 
-              {/* Overlay with Play Icon - hidden in delete mode */}
               {!isDeleteMode && (
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center">
                   <svg
